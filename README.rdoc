@@ -1,0 +1,8 @@
+= acts_as_lookup
+
+== Overview
+
+Provides an easy means for creating models that act like enumerations or lookup tables. You can specify the lookup values in your Rails models and can lazily push these to the associated db tables (or not). Also dynamically adds helpful class-level methods to access singleton instances of each value in your lookup
+
+== What to do
+
