@@ -1,0 +1,7 @@
+HEAD
+----
+* adding in the has_lookup method for Rails models to associate to lookup models
+
+0.0.1
+----
+* first implementation of the gem, makes lots of assumptions

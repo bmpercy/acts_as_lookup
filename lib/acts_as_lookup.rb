@@ -10,6 +10,7 @@ module ActsAsLookupClassMethods
     @@acts_as_lookup_options
   end
 
+
   # FUTURE: allow for dynamically specifying which columns can be used for
   #         cache lookups
   #-----------------------------------------------------------------------------
@@ -69,10 +70,10 @@ module ActsAsLookupClassMethods
 
   # fetches existing records from the db and merges them into the cached values
   #
-  # TODO: if this gem is to be used outside of a Rails' ActiveRecord::Base
-  #       descendant, will need to allow calling class to specify an alternative
-  #       implementation (maybe add a config value that specifies a method to
-  #       call)
+  # FUTURE: if this gem is to be used outside of a Rails' ActiveRecord::Base
+  # descendant, will need to allow calling class to specify an alternative
+  # implementation (maybe add a config value that specifies a method to
+  # call)
   #-----------------------------------------------------------------------------
   def acts_as_lookup_fetch_values
     @@acts_as_lookup_values = self.all
@@ -122,7 +123,7 @@ module ActsAsLookupClassMethods
   # adds a class method to access a particular lookup value via a shortcut
   # method
   #
-  # TODO: FUTURE will allow for any column to be used here; for now, hardcoded
+  # FUTURE: will allow for any column to be used here; for now, hardcoded
   #       to lookup by name
   #-----------------------------------------------------------------------------
   def acts_as_lookup_add_shortcut(name)
@@ -131,6 +132,8 @@ module ActsAsLookupClassMethods
 
 end
 
+# modify object to allow any class to act like a lookup class
+#------------------------------------------------------------------------------
 class Object
 
   # converts the calling class to act like a lookup model.
@@ -143,14 +146,57 @@ class Object
 
     options.reverse_merge! :sync_with_db => true,
                            :write_to_db => true  #,
-# TODO: FUTURE
+# FUTURE:
 #                           :remove_from_db => false,
 #                           :shortcut_method_column => :name
 
     self.acts_as_lookup_options = options
 
-    # TODO: lazy initialize? but for now explicitly initialize here
+    # lazy initialize? but for now explicitly initialize here
     self.acts_as_lookup_initialize
   end
+
+end
+
+# class methods for ActiveRecord associations
+if defined?(ActiveRecord)
+  module ActsAsLookupHasLookupClassMethods
+
+    # code specifying this association is allowed to override the class name
+    # of the association with :class_name
+    #---------------------------------------------------------------------------
+    def has_lookup(association_name, options = {})
+
+      class_name = options[:class_name] || association_name.to_s.camelize
+
+      # this is a hack that is not at all pretty but seems to get around the
+      # double-class loading problems that arise in rails: see for example
+      # https://rails.lighthouseapp.com/projects/8994/tickets/1339
+      # it may create other problems though, so be careful....
+      require File.join(RAILS_ROOT, 'app', 'models', class_name.underscore)
+
+      # this is inspired/borrowed from Rapleaf's has_rap_enum
+      klass = Kernel.const_get(class_name)
+      unless(klass && klass.is_a?(ActsAsLookupClassMethods))
+        raise "#{class_name.to_s.camelize} is not an acts_as_lookup class"
+      end
+
+      # create the reader method for the lookup association
+      define_method(association_name) do
+        klass.lookup_by_id(send("#{association_name}_id"))
+      end
+
+      # create the writer method for the lookup association
+      define_method("#{association_name}=") do |assoc|
+        unless (assoc.class.name == klass.name) || assoc.nil?
+          raise "Argument not of type #{klass.name}"
+        end
+        send("#{association_name}_id=", assoc && assoc.id)
+      end
+    end
+
+  end
+
+  ActiveRecord::Base.extend ActsAsLookupHasLookupClassMethods
 
 end

@@ -6,3 +6,42 @@ Provides an easy means for creating models that act like enumerations or lookup 
 
 == What to do
 
+=== Rails models
+
+==== Defining a lookup model
+
+In your model, do something like:
+
+  def MyLookup < ActiveRecord::Base
+    VALS = [ { :id => 1, :name => "value 1", ... other attributes },
+             { :id => 2, :name => "value 2", ... other attributes },
+             ... other lookup values ...
+           ]
+    acts_as_lookup :values => VALS, ... other options ...
+  end
+
+==== Associating a model with a lookup model
+
+In your model, you can specify an association to a lookup using +has_lookup+:
+
+  def MyModel < ActiveRecord::Base
+    has_lookup :my_lookup
+  end
+
+Alternatively, you can explicitly state the class name of the associated lookup:
+
+  def MyModel < ActiveRecord::Base
+    has_lookup :my_association, :class_name => 'MyLookup'
+  end
+
+==== Alternative: table-less lookups and associations
+
+TODO: probably won't work yet...at least need to add an _id attribute to the associating class....
+
+=== Other (FUTURE)
+
+Some work is yet to be done to support general classes using acts_as_lookup
+
+== Configuration acts_as_lookup
+
+TODO: go through the options (enabled and FUTURE)

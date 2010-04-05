@@ -1,8 +1,8 @@
 Things to work on:
 
-* provide an association method to associate other models to lookup models so that active record doesn't query for the lookup records
+* find a better workaround for the cached instance problem (see https://rails.lighthouseapp.com/projects/8994/tickets/1339, for example) than explicit requiring of lookup classes (see acts_as_lookup.rb : ActsAsLookupHasLookupClassMethods#has_lookup)
 * for now, it's required to include :id in the values hashes; enhance to allow leaving :id off (by specifying :uniqueness_column) and fetch them from db (option will only be available for :sync_with_db == true)
-* allow gem to be used outside Rails by specifying alternative implementations for db-hitting methods....e.g. add configuration values that specify method names to call to load/write/remove from db
+* allow gem to be used outside Rails by specifying alternative implementations for db-hitting methods....e.g. add configuration values that specify method names to call to load/write/remove from db. see +acts_as_lookup_fetch_values+ method comment.
 * add the following configuration options:
 ** sync_with_db: if false, no inserts/retrievals of db will be performed at all. this means the model will operate as an enum-like thing...a lot like rapleaf_enum where the class just defines the mapping and when associations are formed, the id gets inserted.
 *** plan for this to work even if there is no lookup table in db at all...eg if we didn't care about foreign keys and just wanted to store some ids instead of strings....just need to make sure that associations work properly...like user.status = UserAccountStatus.active needs to set user.status_id = UserAccountStatus.active
@@ -24,6 +24,7 @@ Things to work on:
 ** shortcut_method_column: which column to use to create shortcut lookup methods by value
 *** this is used to do the UserAccountStatus.active thing, allowing for doing it with a different column name other than :name if desired
 *** default will be :name
+*** see acts_as_lookup_add_shortcut method
 ** Config this in initializer or env.rb file (might want to be env-specific), hopefully we're fine with it being global to all lookup classes
 *** initialize_on_class_load: force values to load and methods to be created when the class loads, instead of being done lazily
 **** default will be false
