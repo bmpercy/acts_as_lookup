@@ -1,5 +1,8 @@
 HEAD
 ----
+
+0.0.2
+----
 * adding in the has_lookup method for Rails models to associate to lookup models
 * more FUTURE comments added, as well as TODO file additions
 * slight cleanups
