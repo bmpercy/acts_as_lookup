@@ -1,5 +1,6 @@
 Things to work on:
 
+
 * find a better workaround for the cached instance problem (see https://rails.lighthouseapp.com/projects/8994/tickets/1339, for example) than explicit requiring of lookup classes (see acts_as_lookup.rb : ActsAsLookupHasLookupClassMethods#has_lookup)
 * for now, it's required to include :id in the values hashes; enhance to allow leaving :id off (by specifying :uniqueness_column) and fetch them from db (option will only be available for :sync_with_db == true)
 * allow gem to be used outside Rails by specifying alternative implementations for db-hitting methods....e.g. add configuration values that specify method names to call to load/write/remove from db. see +acts_as_lookup_fetch_values+ method comment.
@@ -18,6 +19,7 @@ Things to work on:
 ** indexed_columns: which columns can be used in lookup_by_column methods
 *** allows for specifying other values in the model that don't need to be lookupable columns, e.g. if there are columns with non-unique values, foreign keys to other tables etc.
 *** default will be to use all columns specified in the model
+*** probably store the lookup caches in one giant hash, each entry is a hash :column => lookup_hash_for_that_column
 ** uniqueness_column: which column defines uniqueness of a record if :id is not set in model
 *** allows to leave off the id when specifying the rows in model if it doesn't really matter, but still do the inserting/removing of rows automatically
 *** default will be :name (if :name not specified in the data in the model, then if uniqueness_column isn't set, there will be errors)

@@ -111,10 +111,10 @@ module ActsAsLookupClassMethods
   # updates the lookup cache hashes from @@acts_as_lookup_values
   #-----------------------------------------------------------------------------
   def acts_as_lookup_refresh_caches
+    # FUTURE: this will get cleaned up, and will dynamically select which
+    #         columns to establish lookup caches for.
     @@acts_as_lookup_values.each do |val|
       @@acts_as_lookup_by_id.reverse_merge! val.id => val
-    end
-    @@acts_as_lookup_values.each do |val|
       @@acts_as_lookup_by_name.reverse_merge! val.name => val
     end
   end
@@ -123,11 +123,28 @@ module ActsAsLookupClassMethods
   # adds a class method to access a particular lookup value via a shortcut
   # method
   #
+  # does the following transformations:
+  #  - converts spaces to underscores
+  #  - downcases entire method name unless the constant is already all caps,
+  #    in which case, leaves method name in all caps
+  #  - checks for name conflicts and raises exception if the shortcut method
+  #    name collides with existing method
+  #
   # FUTURE: will allow for any column to be used here; for now, hardcoded
   #       to lookup by name
   #-----------------------------------------------------------------------------
   def acts_as_lookup_add_shortcut(name)
-    instance_eval "def #{name}; self.lookup_by_name '#{name}'; end"
+
+    method_name = name.gsub(/ /, '_')
+    unless method_name.upcase == method_name
+      method_name.downcase!
+    end
+    if respond_to?(method_name.to_sym)
+      raise "Cannot create method '#{method_name}' to #{self.inspect} " +
+            "as it conflicts with existing method with same name"
+    end
+
+    instance_eval "def #{method_name}; self.lookup_by_name '#{name}'; end"
   end
 
 end
@@ -162,8 +179,14 @@ end
 if defined?(ActiveRecord)
   module ActsAsLookupHasLookupClassMethods
 
-    # code specifying this association is allowed to override the class name
-    # of the association with :class_name
+    # create an association from the current rails model to a lookup model,
+    # providing a name for the association (default will assume the
+    # association name follows rails association naming conventions).
+    #
+    # options:
+    #  :class_name: override the default assumption of class name from
+    #               +assocaition_name+ argument and explicitly pass in the
+    #               classname (in CamelCase) for the association.
     #---------------------------------------------------------------------------
     def has_lookup(association_name, options = {})
 

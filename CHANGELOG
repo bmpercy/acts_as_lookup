@@ -1,6 +1,13 @@
 HEAD
 ----
 * adding in the has_lookup method for Rails models to associate to lookup models
+* more FUTURE comments added, as well as TODO file additions
+* slight cleanups
+* when creating shortcut methods, now follow these rules:
+** convert spaces in shortcut column to underscores
+** don't downcase all-caps shortcut names
+** otherwise, downcase everything
+** detect method name conflicts
 
 0.0.1
 ----
