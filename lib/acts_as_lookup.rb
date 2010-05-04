@@ -196,7 +196,9 @@ if defined?(ActiveRecord)
       # double-class loading problems that arise in rails: see for example
       # https://rails.lighthouseapp.com/projects/8994/tickets/1339
       # it may create other problems though, so be careful....
-      require File.join(RAILS_ROOT, 'app', 'models', class_name.underscore)
+      if !Object.const_defined?(class_name)
+        require File.join(RAILS_ROOT, 'app', 'models', class_name.underscore)
+      end
 
       # this is inspired/borrowed from Rapleaf's has_rap_enum
       klass = Kernel.const_get(class_name)
