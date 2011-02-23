@@ -45,3 +45,9 @@ Some work is yet to be done to support general classes using acts_as_lookup
 == Configuration acts_as_lookup
 
 TODO: go through the options (enabled and FUTURE)
+
+== Development
+
+=== Testing
+
+Run rake spec to run the (rspec) tests. You should add tests for anything you touch.

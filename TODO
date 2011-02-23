@@ -1,22 +1,17 @@
 Things to work on:
 
 
-* find a better workaround for the cached instance problem (see https://rails.lighthouseapp.com/projects/8994/tickets/1339, for example) than explicit requiring of lookup classes (see acts_as_lookup.rb : ActsAsLookupHasLookupClassMethods#has_lookup)
 * for now, it's required to include :id in the values hashes; enhance to allow leaving :id off (by specifying :uniqueness_column) and fetch them from db (option will only be available for :sync_with_db == true)
 * allow gem to be used outside Rails by specifying alternative implementations for db-hitting methods....e.g. add configuration values that specify method names to call to load/write/remove from db. see +acts_as_lookup_fetch_values+ method comment.
 * add the following configuration options:
-** sync_with_db: if false, no inserts/retrievals of db will be performed at all. this means the model will operate as an enum-like thing...a lot like rapleaf_enum where the class just defines the mapping and when associations are formed, the id gets inserted.
-*** plan for this to work even if there is no lookup table in db at all...eg if we didn't care about foreign keys and just wanted to store some ids instead of strings....just need to make sure that associations work properly...like user.status = UserAccountStatus.active needs to set user.status_id = UserAccountStatus.active
-*** this might be kind of tricky to do without mucking with the active record association methods (belongs_to() etc.)
-*** if false, don't have the requirement that there's an :id column specified
-*** so maybe this no-table business will be FUTURE only...
-*** default will be true
-** write_to_db: if true will insert values specified in model into db table if the row doesn't exist (based on id)
-*** default will be true
-** remove_from_db: if there is an id in the table not specified in the model, will remove that row (removal will happen before any inserts)
-*** allows for there to be values in lookup table that aren't relevant for the rails app (e.g. something that only some other process needs)
-*** default will be false
-** indexed_columns: which columns can be used in lookup_by_column methods
+* if :sync_with_db false, don't have the requirement that there's an :id column specified
+** so maybe this no-table business will be FUTURE only...
+** default will be true
+* write_to_db: if true will insert values specified in model into db table if the row doesn't exist (based on id)
+** default will be true
+* remove_from_db: if there is an id in the table not specified in the model, will remove that row (removal will happen before any inserts)
+** allows for there to be values in lookup table that aren't relevant for the rails app (e.g. something that only some other process needs)
+** default will be false
 *** allows for specifying other values in the model that don't need to be lookupable columns, e.g. if there are columns with non-unique values, foreign keys to other tables etc.
 *** default will be to use all columns specified in the model
 *** probably store the lookup caches in one giant hash, each entry is a hash :column => lookup_hash_for_that_column

@@ -1,5 +1,10 @@
 require 'rake'
 
+require 'rubygems'
+gem 'rspec'
+require 'spec/rake/spectask'
+
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
@@ -12,7 +17,7 @@ push these to the associated db tables (or not). Also dynamically adds helpful
 class-level methods to access singleton instances of each value in your lookup
 table.
 DESC
-    gemspec.email = "percivalatumamibuddotcom"
+    gemspec.email = "percivalatdiscovereadsdotcom"
     gemspec.homepage = "http://github.com/bmpercy/acts_as_lookup"
     gemspec.authors = ['Brian Percival']
     gemspec.files = ["acts_as_lookup.gemspec",
@@ -22,4 +27,11 @@ DESC
   Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+end
+
+desc 'Test the gem.'
+Spec::Rake::SpecTask.new(:spec) do |t|
+  t.libs << 'lib'
+  t.verbose = true
+  t.spec_opts = ['--colour', '--format progress', '--loadby mtime', '--reverse', '--backtrace']
 end
