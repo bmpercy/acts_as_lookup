@@ -1,5 +1,8 @@
 HEAD
 ----
+
+0.1.0
+----
 * hopefully fixed the collisions that were occuring if more than one class used
   acts_as_lookup at the same time.
 
