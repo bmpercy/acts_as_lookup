@@ -226,7 +226,7 @@ describe "ActsAsLookup" do
       )
     end
 
-    it "should insert any new values even if :write_to_db is true" do
+    it "should insert any new values when :write_to_db is true" do
       # this is a dummy class method that gets called when instance method
       # save! is called, so we can check what was created
       @klass.should_receive(:created_val) { |val|
