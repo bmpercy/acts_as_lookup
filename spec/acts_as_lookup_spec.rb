@@ -159,6 +159,35 @@ describe "ActsAsLookup" do
         :values => instances
       )
     end
+
+    it "should define query methods if :add_query_methods is true" do
+      klass = ClassOnlyLookupClass
+      klass.should_not_receive :all
+      instances = [klass.new(1, "one"), klass.new(2, "two")]
+
+      klass.acts_as_lookup(
+        :add_query_methods => true,
+        :sync_with_db => false,
+        :values => instances
+      )
+
+      klass.one.one?.should be_true
+      klass.one.two?.should be_false
+    end
+
+    it "should not define query methods if :add_query_methods is false" do
+      klass = ClassOnlyLookupClass
+      klass.should_not_receive :all
+      instances = [klass.new(1, "one"), klass.new(2, "two")]
+
+      klass.acts_as_lookup(
+        :add_query_methods => false,
+        :sync_with_db => false,
+        :values => instances
+      )
+
+      klass.one.one?.should raise_error
+    end
   end
 
   # "active record" tests

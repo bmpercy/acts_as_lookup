@@ -42,9 +42,34 @@ TODO: probably won't work yet...at least need to add an _id attribute to the ass
 
 Some work is yet to be done to support general classes using acts_as_lookup
 
-== Configuration acts_as_lookup
+== Configuration
 
-TODO: go through the options (enabled and FUTURE)
++acts_as_lookup+ accepts an options hash with one required key: +:values+, which is
+an array of hashes that contain lookup data (see above).
+
+Other options available:
+
+==== +:sync_with_db+
+
+Fetches existing records from the db and merges them into the cached values (default true).
+
+==== +:write_to_db+
+
+Writes any missing values to the db (default true).
+
+==== +:add_query_methods+
+
+Defines query methods on instances of the lookup model for checking the identity of a value (default false). For example:
+
+  def Status < ActiveRecord::Base
+    VALS = [ { :id => 1, :name => "active", },
+             { :id => 2, :name => "disabled", }
+           ]
+    acts_as_lookup :values => VALS, :add_query_methods => true
+  end
+
+  Status.active.active? # => true
+  Status.active.disabled? # => false
 
 == Development
 

@@ -60,6 +60,9 @@ module ActsAsLookupClassMethods
       # FUTURE: allow for a different column to be used for generating class
       #         accessor methods
       @acts_as_lookup_by_name.each_pair do |name,val|
+        if acts_as_lookup_options[:add_query_methods]
+          self.acts_as_lookup_add_query_method name
+        end
         self.acts_as_lookup_add_shortcut name
       end
 
@@ -123,21 +126,11 @@ module ActsAsLookupClassMethods
   # adds a class method to access a particular lookup value via a shortcut
   # method
   #
-  # does the following transformations:
-  #  - converts spaces to underscores
-  #  - downcases entire method name unless the constant is already all caps,
-  #    in which case, leaves method name in all caps
-  #  - checks for name conflicts and raises exception if the shortcut method
-  #    name collides with existing method
-  #
   # FUTURE: will allow for any column to be used here; for now, hardcoded
   #       to lookup by name
   #-----------------------------------------------------------------------------
   def acts_as_lookup_add_shortcut(name)
-    method_name = name.gsub(/ /, '_')
-    unless method_name.upcase == method_name
-      method_name.downcase!
-    end
+    method_name = get_method_name(name)
     if respond_to?(method_name.to_sym)
       raise "Cannot create method '#{method_name}' to #{self.inspect} " +
             "as it conflicts with existing method with same name"
@@ -145,7 +138,38 @@ module ActsAsLookupClassMethods
 
     instance_eval "def #{method_name}; self.lookup_by_name '#{name}'; end"
   end
+
+  # adds an instance method of the form [lookup_value_name]? to check the
+  # identity of a lookup object
+  #-----------------------------------------------------------------------------
+  def acts_as_lookup_add_query_method(lookup_name)
+    method_name = "#{get_method_name(lookup_name)}?"
+    if respond_to?(method_name.to_sym)
+      raise "Cannot create method '#{method_name}?' to #{self.inspect} " +
+            "as it conflicts with existing method with same name"
+    end
+
+    define_method(method_name) { self.name == lookup_name }
+  end
+
+  private
+
+  # does the following transformations:
+  #  - converts spaces to underscores
+  #  - downcases entire method name unless the constant is already all caps,
+  #    in which case, leaves method name in all caps
+  #  - checks for name conflicts and raises exception if the shortcut method
+  #    name collides with existing method
+  #-----------------------------------------------------------------------------
+  def get_method_name(name)
+    method_name = name.gsub(/ /, '_')
+    unless method_name.upcase == method_name
+      method_name.downcase!
+    end
+    method_name
+  end
 end
+
 
 # modify object to allow any class to act like a lookup class
 #------------------------------------------------------------------------------
@@ -161,6 +185,7 @@ class Object
 
     options.merge!(:sync_with_db => true) unless options.include?(:sync_with_db)
     options.merge!(:write_to_db => true) unless options.include?(:write_to_db)
+    options.merge!(:add_query_methods => false) unless options.include?(:add_query_methods)
 # FUTURE:
 #                           :remove_from_db => false,
 #                           :shortcut_method_column => :name
@@ -219,8 +244,15 @@ if defined?(ActiveRecord)
       # double-class loading problems that arise in rails: see for example
       # https://rails.lighthouseapp.com/projects/8994/tickets/1339
       # it may create other problems though, so be careful....
+      rails_root = nil
+      begin
+        rails_root = Rails.root
+      rescue
+      end
+      # fallback for Rails 2
+      rails_root ||= RAILS_ROOT if defined?(RAILS_ROOT)
       if !Object.const_defined?(cname)
-        require File.join(RAILS_ROOT, 'app', 'models', cname.underscore)
+        require File.join(rails_root, 'app', 'models', cname.underscore)
       end
     end
   end
