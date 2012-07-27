@@ -1,6 +1,12 @@
 HEAD
 ----
 
+0.2.0
+----
+* add query methods for lookup value instances, so they can check their
+  identity; for example, Status.active.active?
+* fix Rails 3 compatibility issue (RAILS_ROOT usage)
+
 0.1.0
 ----
 * hopefully fixed the collisions that were occuring if more than one class used
