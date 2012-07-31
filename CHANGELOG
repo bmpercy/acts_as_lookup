@@ -1,6 +1,10 @@
 HEAD
 ----
 
+0.2.1
+----
+* check for existence of attribute setter in acts_as_lookup_write_missing_values
+
 0.2.0
 ----
 * add query methods for lookup value instances, so they can check their

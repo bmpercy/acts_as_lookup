@@ -97,10 +97,13 @@ module ActsAsLookupClassMethods
     acts_as_lookup_options[:values].each do |val|
       next if @acts_as_lookup_by_id.include?(val[:id])
 
-      # allow for attr_accessible protection, assign attributes one-by-one
+      # bypass attr_accessible protection, assign attributes one-by-one
       new_val = self.new
       val.each_pair do |attr,value|
-        new_val.send("#{attr.to_s}=".to_sym, value)
+        setter = "#{attr.to_s}=".to_sym
+        if new_val.respond_to?(setter)
+          new_val.send(setter, value)
+        end
       end
       new_val.save!
 
