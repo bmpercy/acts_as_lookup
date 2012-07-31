@@ -1,5 +1,6 @@
 Things to work on:
 
+* TESTING: commented out rspec gem in Rakefile...need to resurrect to reenable testing! May just need to specify rspec version, but would probably be good to bring up to date. :(
 
 * for now, it's required to include :id in the values hashes; enhance to allow leaving :id off (by specifying :uniqueness_column) and fetch them from db (option will only be available for :sync_with_db == true)
 * allow gem to be used outside Rails by specifying alternative implementations for db-hitting methods....e.g. add configuration values that specify method names to call to load/write/remove from db. see +acts_as_lookup_fetch_values+ method comment.

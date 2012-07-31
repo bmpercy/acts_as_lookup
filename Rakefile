@@ -1,8 +1,11 @@
 require 'rake'
 
 require 'rubygems'
-gem 'rspec'
-require 'spec/rake/spectask'
+
+
+# TODO: update rspec stuff here so it works, at least specify version?
+#gem 'rspec'
+#require 'spec/rake/spectask'
 
 
 begin
@@ -29,9 +32,10 @@ rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-desc 'Test the gem.'
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.libs << 'lib'
-  t.verbose = true
-  t.spec_opts = ['--colour', '--format progress', '--loadby mtime', '--reverse', '--backtrace']
-end
+# TODO: see above...get rspec integrated here again
+# desc 'Test the gem.'
+# Spec::Rake::SpecTask.new(:spec) do |t|
+#   t.libs << 'lib'
+#   t.verbose = true
+#   t.spec_opts = ['--colour', '--format progress', '--loadby mtime', '--reverse', '--backtrace']
+# end
